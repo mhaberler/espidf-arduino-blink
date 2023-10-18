@@ -1,5 +1,5 @@
-#include <FastLED.h>
 
+#include <FastLED.h>
 
 #define BRIGHTNESS 64
 #define COLOR_ORDER GRB
@@ -36,18 +36,15 @@ TBlendType currentBlending;
 extern CRGBPalette16 myRedWhiteBluePalette;
 extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 
-void setup() {
-#ifdef ARDUINO_USB_CDC_ON_BOOT
-  delay(3000); // wait for USB to come uo before chatting
-#endif
+void setup()
+{
+  delay(2500);
   Serial.begin(115200);
-
-  while (!Serial) {
-    yield();
-  }
-  Serial.printf("Hello, World!\n");
-  Serial.printf("Total PSRAM=%u\n", ESP.getPsramSize());
-  Serial.printf("Free PSRAM=%u\n", ESP.getFreePsram());
+  delay(500);
+  Serial.printf("Total heap: %d\n", ESP.getHeapSize());
+  Serial.printf("Free heap: %d\n", ESP.getFreeHeap());
+  Serial.printf("Total PSRAM: %d\n", ESP.getPsramSize());
+  Serial.printf("Free PSRAM: %d\n", ESP.getFreePsram());
 
   FastLED.addLeds<FASTLED_TYPE, FASTLED_DATA_PIN, COLOR_ORDER>(leds, FASTLED_NUM_LEDS)
       .setCorrection(TypicalLEDStrip);
@@ -57,7 +54,8 @@ void setup() {
   currentBlending = LINEARBLEND;
 }
 
-void loop() {
+void loop()
+{
   ChangePalettePeriodically();
 
   static uint8_t startIndex = 0;
@@ -67,12 +65,15 @@ void loop() {
 
   FastLED.show();
   FastLED.delay(1000 / UPDATES_PER_SECOND);
+  vTaskDelay(1);
 }
 
-void FillLEDsFromPaletteColors(uint8_t colorIndex) {
+void FillLEDsFromPaletteColors(uint8_t colorIndex)
+{
   uint8_t brightness = 255;
 
-  for (int i = 0; i < FASTLED_NUM_LEDS; i++) {
+  for (int i = 0; i < FASTLED_NUM_LEDS; i++)
+  {
     leds[i] = ColorFromPalette(currentPalette, colorIndex, brightness,
                                currentBlending);
     colorIndex += 3;
@@ -88,53 +89,66 @@ void FillLEDsFromPaletteColors(uint8_t colorIndex) {
 // Additionally, you can manually define your own color palettes, or you can
 // write code that creates color palettes on the fly.  All are shown here.
 
-void ChangePalettePeriodically() {
+void ChangePalettePeriodically()
+{
   uint8_t secondHand = (millis() / 1000) % 60;
   static uint8_t lastSecond = 99;
 
-  if (lastSecond != secondHand) {
+  if (lastSecond != secondHand)
+  {
     lastSecond = secondHand;
-    if (secondHand == 0) {
+    if (secondHand == 0)
+    {
       currentPalette = RainbowColors_p;
       currentBlending = LINEARBLEND;
     }
-    if (secondHand == 10) {
+    if (secondHand == 10)
+    {
       currentPalette = RainbowStripeColors_p;
       currentBlending = NOBLEND;
     }
-    if (secondHand == 15) {
+    if (secondHand == 15)
+    {
       currentPalette = RainbowStripeColors_p;
       currentBlending = LINEARBLEND;
     }
-    if (secondHand == 20) {
+    if (secondHand == 20)
+    {
       SetupPurpleAndGreenPalette();
       currentBlending = LINEARBLEND;
     }
-    if (secondHand == 25) {
+    if (secondHand == 25)
+    {
       SetupTotallyRandomPalette();
       currentBlending = LINEARBLEND;
     }
-    if (secondHand == 30) {
+    if (secondHand == 30)
+    {
       SetupBlackAndWhiteStripedPalette();
       currentBlending = NOBLEND;
     }
-    if (secondHand == 35) {
+    if (secondHand == 35)
+    {
       SetupBlackAndWhiteStripedPalette();
       currentBlending = LINEARBLEND;
     }
-    if (secondHand == 40) {
+    if (secondHand == 40)
+    {
       currentPalette = CloudColors_p;
       currentBlending = LINEARBLEND;
     }
-    if (secondHand == 45) {
+    if (secondHand == 45)
+    {
       currentPalette = PartyColors_p;
       currentBlending = LINEARBLEND;
     }
-    if (secondHand == 50) {
+    if (secondHand == 50)
+    {
       currentPalette = myRedWhiteBluePalette_p;
       currentBlending = NOBLEND;
     }
-    if (secondHand == 55) {
+    if (secondHand == 55)
+    {
       currentPalette = myRedWhiteBluePalette_p;
       currentBlending = LINEARBLEND;
     }
@@ -142,8 +156,10 @@ void ChangePalettePeriodically() {
 }
 
 // This function fills the palette with totally random colors.
-void SetupTotallyRandomPalette() {
-  for (int i = 0; i < 16; i++) {
+void SetupTotallyRandomPalette()
+{
+  for (int i = 0; i < 16; i++)
+  {
     currentPalette[i] = CHSV(random8(), 255, random8());
   }
 }
@@ -152,7 +168,8 @@ void SetupTotallyRandomPalette() {
 // using code.  Since the palette is effectively an array of
 // sixteen CRGB colors, the various fill_* functions can be used
 // to set them up.
-void SetupBlackAndWhiteStripedPalette() {
+void SetupBlackAndWhiteStripedPalette()
+{
   // 'black out' all 16 palette entries...
   fill_solid(currentPalette, 16, CRGB::Black);
   // and set every fourth one to white.
@@ -163,7 +180,8 @@ void SetupBlackAndWhiteStripedPalette() {
 }
 
 // This function sets up a palette of purple and green stripes.
-void SetupPurpleAndGreenPalette() {
+void SetupPurpleAndGreenPalette()
+{
   CRGB purple = CHSV(HUE_PURPLE, 255, 255);
   CRGB green = CHSV(HUE_GREEN, 255, 255);
   CRGB black = CRGB::Black;
@@ -182,10 +200,10 @@ const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM = {
     CRGB::Gray, // 'white' is too bright compared to red and blue
     CRGB::Blue, CRGB::Black,
 
-    CRGB::Red,  CRGB::Gray,  CRGB::Blue,  CRGB::Black,
+    CRGB::Red, CRGB::Gray, CRGB::Blue, CRGB::Black,
 
-    CRGB::Red,  CRGB::Red,   CRGB::Gray,  CRGB::Gray,
-    CRGB::Blue, CRGB::Blue,  CRGB::Black, CRGB::Black};
+    CRGB::Red, CRGB::Red, CRGB::Gray, CRGB::Gray,
+    CRGB::Blue, CRGB::Blue, CRGB::Black, CRGB::Black};
 
 // Additionl notes on FastLED compact palettes:
 //
