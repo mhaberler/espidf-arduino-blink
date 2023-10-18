@@ -41,13 +41,13 @@ extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 
 void setup()
 {
-  delay(2500);
+
+  delay(3500);
+  delay(500);
 #ifdef M5UNIFIED
   M5.begin();
 #endif
   Serial.begin(115200);
-  delay(500);
-
   Serial.printf("Total heap: %d\n", ESP.getHeapSize());
   Serial.printf("Free heap: %d\n", ESP.getFreeHeap());
   Serial.printf("Total PSRAM: %d\n", ESP.getPsramSize());
