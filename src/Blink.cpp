@@ -1,3 +1,6 @@
+#ifdef M5UNIFIED
+#include <M5Unified.h>
+#endif
 
 #include <FastLED.h>
 
@@ -39,8 +42,12 @@ extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 void setup()
 {
   delay(2500);
+#ifdef M5UNIFIED
+  M5.begin();
+#endif
   Serial.begin(115200);
   delay(500);
+
   Serial.printf("Total heap: %d\n", ESP.getHeapSize());
   Serial.printf("Free heap: %d\n", ESP.getFreeHeap());
   Serial.printf("Total PSRAM: %d\n", ESP.getPsramSize());
@@ -48,6 +55,9 @@ void setup()
 
   FastLED.addLeds<FASTLED_TYPE, FASTLED_DATA_PIN, COLOR_ORDER>(leds, FASTLED_NUM_LEDS)
       .setCorrection(TypicalLEDStrip);
+
+  // FastLED.addLeds<NEOPIXEL, FASTLED_DATA_PIN>(leds, FASTLED_NUM_LEDS); // GRB ordering is assumed
+
   FastLED.setBrightness(BRIGHTNESS);
 
   currentPalette = RainbowColors_p;
